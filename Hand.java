@@ -1,3 +1,5 @@
+import java.awt.Graphics2D;
+
 public class Hand {
     // Define instance variables here
     private int playerID;
@@ -13,6 +15,13 @@ public class Hand {
     private boolean doublable;
     private boolean standing;
     private int bet;
+    Box box;
+    /*
+     * static int nextPlayerCardX = DisplayPanel.tile;
+     * static int PlayerCardY = DisplayPanel.tile + Card.cardHeight;
+     * static int nextDealerCardX = DisplayPanel.tile;
+     * static int DealerCardY = DisplayPanel.tile;
+     */
 
     // Constructor
     public Hand(int playerID, int ID, int bet) {
@@ -57,19 +66,19 @@ public class Hand {
         if (currentFreeCardPosition <= 22) {
 
             if (doubled) {
-                System.out.println("Cannot add another card");
+                System.out.println("doubled");
                 return null;
 
             }
 
             if (busted) {
-                System.out.println("Cannot add another card");
+                System.out.println("busted");
                 return null;
 
             }
 
             cards[currentFreeCardPosition] = card;
-            runningTotal += card.getRank();
+            runningTotal += card.getcardValue();
 
             if (currentFreeCardPosition == 0 && card.isAce()) {
                 firstHandAce = true;
@@ -77,8 +86,10 @@ public class Hand {
             }
             if (currentFreeCardPosition == 1 && cards[0].equalsNoSuit(cards[1])) {
                 splittable = true;
+                DisplayPanel.btnSplit.setVisible(true);
                 System.out.println("Splittable cards");
             } else {
+                DisplayPanel.btnSplit.setVisible(false);
                 splittable = false;
             }
             if (runningTotal == 21 && currentFreeCardPosition == 1) {
@@ -91,10 +102,13 @@ public class Hand {
 
             if (currentFreeCardPosition == 1) {
                 doublable = true;
+                DisplayPanel.btnDouble.setVisible(true);
             } else if (currentFreeCardPosition == 0 && cards[0].isAce()) {
                 doublable = true;
+                DisplayPanel.btnDouble.setVisible(true);
             } else {
                 doublable = false;
+                DisplayPanel.btnDouble.setVisible(false);
             }
 
             currentFreeCardPosition++;
@@ -109,9 +123,9 @@ public class Hand {
 
     public Card Double() {
         bet += bet;
-
+        Card temp = addCard();
         doubled = true;
-        return addCard();
+        return temp;
 
     }
 
@@ -181,9 +195,7 @@ public class Hand {
     }
 
     public void newHand() {
-        for (Card card : cards) {
-            card = null;
-        }
+        cards = new Card[22];
         busted = false;
         doubled = false;
         firstHandAce = false;
@@ -194,10 +206,67 @@ public class Hand {
         currentFreeCardPosition = 0;
         runningTotal = 0;
         bet = 0;
+        /*
+         * nextPlayerCardX = DisplayPanel.tile;
+         * nextDealerCardX = DisplayPanel.tile;
+         */
     }
 
     public Card getCard(int pos) {
         return cards[pos];
+    }
+
+    public void draw(Graphics2D g2) {
+
+        for (int i = 0; i < currentFreeCardPosition; i++) {
+            if (cards[i] != null)
+                if (i == 0 || (i != 0 && cards[i - 1].hasArrived())) {
+                    cards[i].draw(g2);
+
+                }
+        }
+
+    }
+
+    public int getNumCards() {
+        int temp = 0;
+        for (Card card : cards) {
+            if (card != null) {
+                temp++;
+            }
+        }
+        return temp;
+    }
+
+    public boolean isSplittable() {
+        return splittable;
+    }
+
+    public void setBox(Box box) {
+        this.box = box;
+        for (int i = 0; i < cards.length; i++) {
+            if (cards[i] != null) {
+
+                cards[i].setBox(box);
+            }
+        }
+    }
+
+    public Box getBox() {
+        return box;
+    }
+
+    public int getXPos() {
+        return box.getXPos();
+    }
+
+    public int getYPos() {
+        return box.getYPos();
+    }
+
+    public void addCard(Card card) {
+        cards[currentFreeCardPosition] = card;
+        currentFreeCardPosition++;
     }
 
 }

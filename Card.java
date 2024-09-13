@@ -1,60 +1,9 @@
-public enum Card {
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 
-    Club_2(2, Suit.CLUBS),
-    Club_3(3, Suit.CLUBS),
-    Club_4(4, Suit.CLUBS),
-    Club_5(5, Suit.CLUBS),
-    Club_6(6, Suit.CLUBS),
-    Club_7(7, Suit.CLUBS),
-    Club_8(8, Suit.CLUBS),
-    Club_9(9, Suit.CLUBS),
-    Club_10(10, Suit.CLUBS),
-    Club_JACK(10, Suit.CLUBS, true),
-    Club_QUEEN(10, Suit.CLUBS, true),
-    Club_KING(10, Suit.CLUBS, true),
-    Club_ACE(1, Suit.CLUBS, true),
-
-    Diamond_2(2, Suit.DIAMONDS),
-    Diamond_3(3, Suit.DIAMONDS),
-    Diamond_4(4, Suit.DIAMONDS),
-    Diamond_5(5, Suit.DIAMONDS),
-    Diamond_6(6, Suit.DIAMONDS),
-    Diamond_7(7, Suit.DIAMONDS),
-    Diamond_8(8, Suit.DIAMONDS),
-    Diamond_9(9, Suit.DIAMONDS),
-    Diamond_10(10, Suit.DIAMONDS),
-    Diamond_JACK(10, Suit.DIAMONDS, true),
-    Diamond_QUEEN(10, Suit.DIAMONDS, true),
-    Diamond_KING(10, Suit.DIAMONDS, true),
-    Diamond_ACE(1, Suit.DIAMONDS, true),
-
-    Heart_2(2, Suit.HEARTS),
-    Heart_3(3, Suit.HEARTS),
-    Heart_4(4, Suit.HEARTS),
-    Heart_5(5, Suit.HEARTS),
-    Heart_6(6, Suit.HEARTS),
-    Heart_7(7, Suit.HEARTS),
-    Heart_8(8, Suit.HEARTS),
-    Heart_9(9, Suit.HEARTS),
-    Heart_10(10, Suit.HEARTS),
-    Heart_JACK(10, Suit.HEARTS, true),
-    Heart_QUEEN(10, Suit.HEARTS, true),
-    Heart_KING(10, Suit.HEARTS, true),
-    Heart_ACE(1, Suit.HEARTS, true),
-
-    Spade_2(2, Suit.SPADES),
-    Spade_3(3, Suit.SPADES),
-    Spade_4(4, Suit.SPADES),
-    Spade_5(5, Suit.SPADES),
-    Spade_6(6, Suit.SPADES),
-    Spade_7(7, Suit.SPADES),
-    Spade_8(8, Suit.SPADES),
-    Spade_9(9, Suit.SPADES),
-    Spade_10(10, Suit.SPADES),
-    Spade_JACK(10, Suit.SPADES, true),
-    Spade_QUEEN(10, Suit.SPADES, true),
-    Spade_KING(10, Suit.SPADES, true),
-    Spade_ACE(1, Suit.SPADES, true);
+public class Card {
 
     public enum Suit {
         SPADES("♠"), // Unicode for ♠
@@ -74,45 +23,45 @@ public enum Card {
         }
     }
 
-    private int rank;
+    private int cardValue;
     private Suit suit;
     private boolean courtCard;
     private String suitString;
-    private String rankString;
-    private boolean faceDown;
-    /*
-     * private final static int cardSymbolY = 2 * tile;
-     * private final static int cardSymbolX = 2 * tile;
-     * private final static int cardRankY = 2 * tile;
-     * private final static int cardRankX = 2 * tile;
-     */
+    private String cardValueString;
+    private boolean arrived;
+    final static int cardHeight = 3 * DisplayPanel.tile;
+    final static int cardWidth = 2 * DisplayPanel.tile;
+    int Xpos = Shoe.deckX;
+    int Ypos = Shoe.deckY;
+    Box box;
+    Counter time;
+    boolean timerStarted;
 
-    private Card(int rank, Suit suit) {
-        this.rank = rank;
+    public Card(int cardValue, Suit suit) {
+        this.cardValue = cardValue;
         this.suit = suit;
         courtCard = false;
         this.suitString = suit.getSymbol();
-        this.rankString = Integer.toString(rank);
+        this.cardValueString = Integer.toString(cardValue);
+        arrived = false;
+
     }
 
-    private Card(int rank, Suit suit, boolean courtCard) {
-        this.rank = rank;
+    public Card(int cardValue, Suit suit, boolean courtCard) {
+        this.cardValue = cardValue;
         this.suit = suit;
         this.courtCard = courtCard;
         this.suitString = suit.getSymbol();
-        this.rankString = Integer.toString(rank);
+        this.cardValueString = Integer.toString(cardValue);
+        arrived = false;
     }
 
-    public int getRank() {
-        return rank;
+    public int getcardValue() {
+        return cardValue;
     }
 
-    public void setFaceDown() {
-        faceDown = true;
-    }
-
-    public void setFaceUp() {
-        faceDown = false;
+    public void arrived() {
+        arrived = true;
     }
 
     public Suit getSuit() {
@@ -125,7 +74,8 @@ public enum Card {
 
     public boolean equals(Card card) {
         if (card != null) {
-            if (this.rank == card.getRank() && this.suit == card.getSuit() && this.courtCard == card.isCourtCard()) {
+            if (this.cardValue == card.getcardValue() && this.suit == card.getSuit()
+                    && this.courtCard == card.isCourtCard()) {
                 return true;
             } else {
                 return false;
@@ -137,7 +87,7 @@ public enum Card {
 
     public boolean equalsNoSuit(Card card) {
         if (card != null) {
-            if (this.rank == card.getRank() && this.courtCard == card.isCourtCard()) {
+            if (this.cardValue == card.getcardValue()) {
                 return true;
             } else {
                 return false;
@@ -148,7 +98,7 @@ public enum Card {
     }
 
     public boolean isAce() {
-        if (this.rank == 1 && this.isCourtCard()) {
+        if (this.cardValue == 1 && this.isCourtCard()) {
             return true;
         } else {
             return false;
@@ -156,7 +106,7 @@ public enum Card {
     }
 
     public String toString() {
-        return "Card added: " + rank + " " + suit + " Face card: " + courtCard;
+        return "Card added: " + cardValue + " " + suit + " Face card: " + courtCard;
     }
 
     public String getCardSuit() {
@@ -164,7 +114,84 @@ public enum Card {
         return suitString;
     }
 
-    public String getCardRank() {
-        return rankString;
+    public String getCardcardValue() {
+        return cardValueString;
     }
+
+    public void update() {
+
+    }
+
+    public boolean hasArrived() {
+        return arrived;
+    }
+
+    public void draw(Graphics2D g2) {
+
+        if (Ypos != box.getYPos()) {
+
+            g2.setColor(new Color(200, 0, 0)); // Red color for the back of the card
+            g2.fillRoundRect(Xpos, Ypos, Card.cardWidth, Card.cardHeight,
+                    10, 10); // Draw rounded
+            // rectangle
+
+            // Draw the card border
+            g2.setColor(Color.WHITE);
+            g2.setStroke(new BasicStroke(5));
+            g2.drawRoundRect(Xpos, Ypos, Card.cardWidth, Card.cardHeight,
+                    10, 10); // Draw white
+            Ypos += 20;
+            if (Ypos > box.getYPos()) {
+                Ypos = box.getYPos();
+            }
+        }
+
+        if (Xpos != box.getXPos()) {
+            g2.setColor(new Color(200, 0, 0)); // Red color for the back of the card
+            g2.fillRoundRect(Xpos, Ypos, Card.cardWidth, Card.cardHeight,
+                    10, 10); // Draw rounded
+            // rectangle
+
+            // Draw the card border
+            g2.setColor(Color.WHITE);
+            g2.setStroke(new BasicStroke(5));
+            g2.drawRoundRect(Xpos, Ypos, Card.cardWidth, Card.cardHeight,
+                    10, 10); // Draw white
+            Xpos -= 20;
+            if (Xpos < box.getXPos()) {
+                Xpos = box.getXPos();
+            }
+        }
+
+        if (Xpos == box.getXPos() && Ypos == box.getYPos()) {
+            arrived();
+            g2.setPaint(Color.WHITE);
+            g2.fillRoundRect(Xpos, Ypos, cardWidth, cardHeight, 10, 10);
+            g2.setColor(Color.BLACK);
+            g2.setFont(new Font("Arial", Font.BOLD, 28));
+            if (suitString.equals("♥")
+                    || suitString.equals("♦")) {
+                g2.setColor(Color.RED);
+            }
+            g2.drawString(cardValueString,
+                    Xpos + 5, Ypos + 30); // Top-left
+
+            g2.drawString(suitString,
+                    Xpos + 5, Ypos + 50); // Top-right
+
+        }
+        if (Xpos > DisplayPanel.windowWidth || Xpos < 0 || Ypos < 0 || Ypos > DisplayPanel.windowHeight) {
+            System.out.println("Card out of bounds X:" + Xpos + " Y: " + Ypos);
+        }
+
+    }
+
+    public void setBox(Box box) {
+        this.box = box;
+    }
+
+    public Box getBox() {
+        return box;
+    }
+
 }

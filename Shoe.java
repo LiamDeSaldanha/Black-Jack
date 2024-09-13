@@ -1,9 +1,14 @@
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.Random;
 
 public class Shoe {
     private int numOfDecks;
     private Card[] shoe;
     private int currentCardCount;
+    static int deckX = DisplayPanel.windowWidth - Card.cardWidth - DisplayPanel.tile;
+    static int deckY = DisplayPanel.dealerY;
 
     public Shoe(int numOfDecks) {
         currentCardCount = 52 * numOfDecks;
@@ -12,11 +17,12 @@ public class Shoe {
         this.numOfDecks = numOfDecks;
         int index = 0;
         for (int i = 0; i < numOfDecks; i++) {
-
-            for (Card card : Card.values()) {
+            Deck deck = new Deck();
+            for (Card card : deck.getCards()) {
                 shoe[index] = card;
                 index++;
             }
+
         }
 
         // Fisher-Yates shuffle algorithm
@@ -48,5 +54,18 @@ public class Shoe {
         }
 
     }
+
+    public void draw(Graphics2D g2) {
+        // Draw the red background
+        g2.setColor(new Color(200, 0, 0)); // Red color for the back of the card
+        g2.fillRoundRect(deckX, deckY, Card.cardWidth, Card.cardHeight, 10, 10); // Draw rounded
+        // rectangle
+
+        // Draw the card border
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(5));
+        g2.drawRoundRect(deckX, deckY, Card.cardWidth, Card.cardHeight, 10, 10); // Draw white
+    }
+
 
 }
