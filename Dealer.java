@@ -1,23 +1,30 @@
+import java.awt.Graphics2D;
+
 public class Dealer {
     private Hand hand;
-    Box box;
+    private int numOfCards;
 
     public Dealer(Box box) {
-        hand = new Hand();
-        this.box = box;
+        hand = new Hand(this);
+        setBox(box);
+        hand.setBox(box);
+        numOfCards = 0;
+    }
+
+    public void setBox(Box box) {
         hand.setBox(box);
     }
 
     public int getXPos() {
-        return box.getXPos();
+        return hand.getXPos();
     }
 
     public int getYPos() {
-        return box.getYPos();
+        return hand.getYPos();
     }
 
     public Box getBox() {
-        return box;
+        return hand.getBox();
     }
 
     public Hand getHand() {
@@ -25,24 +32,33 @@ public class Dealer {
     }
 
     public void Play() {
-
-        BjSimulation.round.addCardDisplay(hand.addCard(), true);
+        hand.addCard();
+      //  BjSimulation.round.addCardDisplay(hand.addCard(), true);
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
 
             e.printStackTrace();
         }
         while (hand.getHandValue() <= 16) {
-            BjSimulation.round.addCardDisplay(hand.addCard(), true);
+            hand.addCard();
+         //   BjSimulation.round.addCardDisplay(hand.addCard(), true);
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
 
                 e.printStackTrace();
             }
         }
 
+    }
+
+    public void update() {
+        hand.update();
+    }
+
+    public void draw(Graphics2D g2) {
+        hand.draw(g2);
     }
 
 }

@@ -1,32 +1,38 @@
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Hand {
+import javax.swing.JButton;
+
+public class Hand implements ActionListener {
     // Define instance variables here
-    private int playerID;
+    private Player player;
+    private Dealer dealer;
     private int ID;
     private Card[] cards;
     private boolean busted;
     private boolean doubled;
+    private boolean splitHand;
     private boolean firstHandAce;
-    private int currentFreeCardPosition;
+    private int numOfCards;
     private int runningTotal;
     private boolean blackJack;
     private boolean splittable;
     private boolean doublable;
     private boolean standing;
     private int bet;
+    private boolean soft;
     Box box;
-    /*
-     * static int nextPlayerCardX = DisplayPanel.tile;
-     * static int PlayerCardY = DisplayPanel.tile + Card.cardHeight;
-     * static int nextDealerCardX = DisplayPanel.tile;
-     * static int DealerCardY = DisplayPanel.tile;
-     */
+    // Buttons
+    private JButton btnHit;
+    private JButton btnDouble;
+    private JButton btnSplit;
+    private JButton btnStand;
 
     // Constructor
-    public Hand(int playerID, int ID, int bet) {
+    public Hand(Player player, int ID, int bet) {
         // Initialize instance variables here
-        this.playerID = playerID;
+        this.player = player;
         this.ID = ID;
         cards = new Card[22];
         busted = false;
@@ -34,84 +40,56 @@ public class Hand {
         firstHandAce = false;
         blackJack = false;
         splittable = false;
-        doublable = false;
+        doublable = true;
         standing = false;
-        currentFreeCardPosition = 0;
+        numOfCards = 0;
         runningTotal = 0;
-
+        soft = false;
         this.bet = bet;
+        splitHand = false;
 
     }
 
-    public Hand() {
+    public Hand(Dealer dealer) {
         // Initialize instance variables here
-
+        this.dealer = dealer;
+        this.ID = -1;
         cards = new Card[22];
         busted = false;
         doubled = false;
         firstHandAce = false;
         blackJack = false;
         splittable = false;
-        doublable = false;
+        doublable = true;
         standing = false;
-        currentFreeCardPosition = 0;
+        numOfCards = 0;
         runningTotal = 0;
+        soft = false;
+        this.bet = 0;
+        splitHand = false;
 
     }
 
     // Add a card to the hand
     public Card addCard() {
         // Implement the logic to add a card to the hand here
+        int nextX = 0;
         Card card = BjSimulation.getShoe().getCard();
-        if (currentFreeCardPosition <= 22) {
+        if (numOfCards <= 22) {
 
-            if (doubled) {
-                System.out.println("doubled");
-                return null;
-
-            }
-
-            if (busted) {
-                System.out.println("busted");
-                return null;
+            if (numOfCards == 0) {
+                nextX = box.getXPos();
+            } else {
+                nextX = cards[numOfCards - 1].getBox().getXPos() + 35;
 
             }
 
-            cards[currentFreeCardPosition] = card;
+            card.setBox(new Box(nextX, box.getYPos()));
+
+            cards[numOfCards] = card;
+            numOfCards++;
             runningTotal += card.getcardValue();
 
-            if (currentFreeCardPosition == 0 && card.isAce()) {
-                firstHandAce = true;
-                System.out.println("first card is a ace");
-            }
-            if (currentFreeCardPosition == 1 && cards[0].equalsNoSuit(cards[1])) {
-                splittable = true;
-                DisplayPanel.btnSplit.setVisible(true);
-                System.out.println("Splittable cards");
-            } else {
-                DisplayPanel.btnSplit.setVisible(false);
-                splittable = false;
-            }
-            if (runningTotal == 21 && currentFreeCardPosition == 1) {
-                blackJack = true;
-                System.out.println("BlackJack");
-            } else if (runningTotal > 21) {
-                busted = true;
-                System.out.println("Busted");
-            }
-
-            if (currentFreeCardPosition == 1) {
-                doublable = true;
-                DisplayPanel.btnDouble.setVisible(true);
-            } else if (currentFreeCardPosition == 0 && cards[0].isAce()) {
-                doublable = true;
-                DisplayPanel.btnDouble.setVisible(true);
-            } else {
-                doublable = false;
-                DisplayPanel.btnDouble.setVisible(false);
-            }
-
-            currentFreeCardPosition++;
             return card;
 
         } else {
@@ -129,28 +107,34 @@ public class Hand {
 
     }
 
-    // Remove a card from the hand
-    public Card removeCard(Card card) {
-        // Implement the logic to remove a card from the hand here
-        if (card == null) {
-            Card temp = cards[currentFreeCardPosition - 1];
-            cards[currentFreeCardPosition - 1] = null;
-            return temp;
+    public Card Split() {
+
+        if (splittable) {
+            numOfCards--;
+            splittable = false;
+            setSplitHand(true);
+
+            Card card = cards[1];
+            cards[1] = null;
+
+            return card;
+
         } else {
             return null;
         }
 
     }
 
-    public Card Split() {
+    public int getBet() {
+        return bet;
+    }
 
-        if (currentFreeCardPosition == 2) {
-            currentFreeCardPosition--;
-            return removeCard(cards[2]);
-        } else {
-            return null;
-        }
+    public void setSplitHand(boolean splitHand) {
+        this.splitHand = splitHand;
+    }
 
+    public boolean isSplitHand() {
+        return splitHand;
     }
 
     public void Stand() {
@@ -178,7 +162,7 @@ public class Hand {
     }
 
     public int getNextFreePosition() {
-        return currentFreeCardPosition;
+        return numOfCards;
     }
 
     public boolean isDoubled() {
@@ -191,25 +175,29 @@ public class Hand {
             if (card != null)
                 temp += card + "\n";
         }
-        return playerID + "\nHand: " + ID + "\n" + temp + "Total: " + runningTotal + "\n";
+        if (player != null) {
+            return "Player: " + player.getID() + "\nHand: " + ID + "\n" + temp + "Total: " + runningTotal + "\n";
+        } else {
+            return "Dealer: " + "\nHand: " + ID + "\n" + temp + "Total: " + runningTotal + "\n";
+        }
+
     }
 
     public void newHand() {
+
         cards = new Card[22];
         busted = false;
         doubled = false;
         firstHandAce = false;
         blackJack = false;
         splittable = false;
-        doublable = false;
+        doublable = true;
         standing = false;
-        currentFreeCardPosition = 0;
+        numOfCards = 0;
         runningTotal = 0;
-        bet = 0;
-        /*
-         * nextPlayerCardX = DisplayPanel.tile;
-         * nextDealerCardX = DisplayPanel.tile;
-         */
+        soft = false;
+        splitHand = false;
+
     }
 
     public Card getCard(int pos) {
@@ -218,7 +206,7 @@ public class Hand {
 
     public void draw(Graphics2D g2) {
 
-        for (int i = 0; i < currentFreeCardPosition; i++) {
+        for (int i = 0; i < numOfCards; i++) {
             if (cards[i] != null)
                 if (i == 0 || (i != 0 && cards[i - 1].hasArrived())) {
                     cards[i].draw(g2);
@@ -228,14 +216,65 @@ public class Hand {
 
     }
 
-    public int getNumCards() {
-        int temp = 0;
-        for (Card card : cards) {
-            if (card != null) {
-                temp++;
+    public void update() {
+        if (player != null) {
+
+            if (cards[0] != null && numOfCards == 0 && cards[0].isAce()) {
+                firstHandAce = true;
+                System.out.println("first card is a ace");
             }
+            if (numOfCards == 2 && cards[1] != null && cards[0] != null && cards[0].equalCardValue(cards[1])) {
+                splittable = true;
+                System.out.println("Splittable cards");
+            } else {
+                splittable = false;
+            }
+            if (runningTotal == 21 && numOfCards == 2) {
+                blackJack = true;
+
+                System.out.println("BlackJack");
+            }
+            if (runningTotal > 21) {
+                busted = true;
+
+                System.out.println("Busted");
+                synchronized (player) {
+                    player.notify();
+
+                }
+            }
+
+            if (numOfCards == 2) {
+
+                doublable = true;
+
+            } else if (isSplitHand() && numOfCards == 1) {
+
+                doublable = true;
+
+            } else {
+
+                doublable = false;
+
+            }
+
+            if (numOfCards >= 1) {
+                btnHit.setVisible(true);
+                btnStand.setVisible(true);
+                if (splittable) {
+                    btnSplit.setVisible(true);
+                }
+                if (doublable || splitHand) {
+                    btnDouble.setVisible(true);
+                }
+            }
+
         }
-        return temp;
+
+    }
+
+    public int getNumCards() {
+        return numOfCards;
     }
 
     public boolean isSplittable() {
@@ -244,10 +283,18 @@ public class Hand {
 
     public void setBox(Box box) {
         this.box = box;
-        for (int i = 0; i < cards.length; i++) {
+        int nextX = 0;
+        for (int i = 0; i < numOfCards; i++) {
             if (cards[i] != null) {
 
-                cards[i].setBox(box);
+                if (i == 0) {
+                    nextX = box.getXPos();
+                } else {
+                    nextX = cards[i - 1].getBox().getXPos() + 35;
+
+                }
+
+                cards[i].setBox(new Box(nextX, box.getYPos()));
             }
         }
     }
@@ -265,8 +312,112 @@ public class Hand {
     }
 
     public void addCard(Card card) {
-        cards[currentFreeCardPosition] = card;
-        currentFreeCardPosition++;
+        cards[numOfCards] = card;
+        numOfCards++;
+    }
+
+    public void setRunningTotal(int runningTotal) {
+        this.runningTotal = runningTotal;
+    }
+
+    public void makeGUI(DisplayPanel displayPanel) {
+
+        if (btnHit != null) {
+            removeButtons(displayPanel);
+        }
+
+        int Ybutton = 0;
+        // Hit button
+        btnHit = new JButton("Hit");
+        btnHit.setBounds(getXPos(), getYPos() + Card.cardHeight + Ybutton + 10,
+                2 * DisplayPanel.tile, DisplayPanel.tile / 2);
+        btnHit.addActionListener(this);
+        displayPanel.add(btnHit);
+        // Stand button
+        Ybutton += DisplayPanel.tile / 2;
+        btnStand = new JButton("Stand");
+        btnStand.setBounds(getXPos(), getYPos() + Card.cardHeight + Ybutton + 10,
+                2 * DisplayPanel.tile, DisplayPanel.tile / 2);
+        btnStand.addActionListener(this);
+        displayPanel.add(btnStand);
+        // Double button
+        Ybutton += DisplayPanel.tile / 2;
+        btnDouble = new JButton("Double");
+        btnDouble.setBounds(getXPos(), getYPos() + Card.cardHeight + Ybutton + 10,
+                2 * DisplayPanel.tile, DisplayPanel.tile / 2);
+        btnDouble.addActionListener(this);
+        displayPanel.add(btnDouble);
+        // Split button
+        Ybutton += DisplayPanel.tile / 2;
+        btnSplit = new JButton("Split");
+        btnSplit.setBounds(getXPos(), getYPos() + Card.cardHeight + Ybutton + 10,
+                2 * DisplayPanel.tile, DisplayPanel.tile / 2);
+        btnSplit.addActionListener(this);
+        displayPanel.add(btnSplit);
+
+        btnHit.setVisible(false);
+        btnStand.setVisible(false);
+        btnDouble.setVisible(false);
+        btnSplit.setVisible(false);
+    }
+
+    public void removeButtons(DisplayPanel displayPanel) {
+        if (displayPanel != null) {
+
+            displayPanel.remove(btnHit);
+            displayPanel.remove(btnStand);
+            displayPanel.remove(btnDouble);
+            displayPanel.remove(btnSplit);
+
+        }
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("Hit")) {
+
+            Card card = addCard();
+
+            synchronized (BjSimulation.player) {
+                BjSimulation.player.notify();
+            }
+
+        }
+
+        if (e.getActionCommand().equals("Double")) {
+
+            Card card = Double();
+
+            synchronized (BjSimulation.player) {
+                BjSimulation.player.notify();
+            }
+        }
+        if (e.getActionCommand().equals("Split")) {
+
+            BjSimulation.player.split(this);
+
+            synchronized (BjSimulation.player) {
+                BjSimulation.player.notify();
+            }
+        }
+        if (e.getActionCommand().equals("Stand")) {
+
+            Stand();
+            synchronized (BjSimulation.player) {
+                BjSimulation.player.notify();
+            }
+
+        }
+
+    }
+
+    public void incNumCards() {
+        numOfCards++;
+    }
+
+    public void setSplittable(boolean splittable) {
+        this.splittable = splittable;
     }
 
 }

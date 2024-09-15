@@ -9,6 +9,7 @@ public class BjSimulation {
         return table.getShoe();
     }
 
+    static DisplayPanel displayPanel;
     static Player player;
     static Dealer dealer;
     static Round round;
@@ -23,7 +24,7 @@ public class BjSimulation {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setTitle("Black Jack");
-        DisplayPanel displayPanel = new DisplayPanel();
+        displayPanel = new DisplayPanel();
         window.add(displayPanel);
         window.pack();
         window.setLocationRelativeTo(null);
@@ -37,7 +38,7 @@ public class BjSimulation {
 
             while (!player.getHand(0).isStanding() && !player.getHand(0).busted()
                     && !player.getHand(0).isDoubled()) {
-
+                        
                 try {
                     synchronized (player) {
                         System.out.println("waiting for play");
@@ -55,7 +56,7 @@ public class BjSimulation {
             }
 
             if (!player.getHand(0).busted()) {
-                DisplayPanel.hideGui();
+                // DisplayPanel.hideGui();
                 dealer.Play();
 
             }

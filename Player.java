@@ -1,21 +1,18 @@
+import java.awt.Graphics2D;
+
 public class Player {
     private int ID;
     private Hand[] hands;
     private int numOfHands;
-
-    Box box;
-    boolean standing;
+    private boolean donePlaying;
 
     public Player(int ID, Box box) {
         this.ID = ID;
         hands = new Hand[28];
         numOfHands = 0;
-        for (int i = 0; i < 28; i++) {
-            hands[i] = new Hand(this.ID, i, 0);
 
-        }
+        hands[0] = new Hand(this, 0, 0);
 
-        this.box = box;
         hands[0].setBox(box);
         numOfHands++;
     }
@@ -24,12 +21,17 @@ public class Player {
         return numOfHands;
     }
 
-    public Box getBox() {
-        return box;
-    }
+    public void newRound() {
+        Box box = hands[0].getBox();
+        for (int i = 0; i < hands.length; i++) {
+            if (hands[i] != null) {
+                hands[i].removeButtons(BjSimulation.displayPanel);
+                hands[i] = null;
 
-    public Player() {
-
+            }
+        }
+        hands[0] = new Hand(this, getID(), 0);
+        hands[0].setBox(box);
     }
 
     public Hand getHand(int ID) {
@@ -40,36 +42,58 @@ public class Player {
         return ID;
     }
 
-    public int getXBox() {
-        return box.getXPos();
+    public void split(Hand hand) {
+        Hand newHand = new Hand(this, getID() + 1, hand.getBet());
+        Card card2 = hand.getCard(1);
+        hand.Split();
+
+        newHand.addCard(card2);
+        hands[1] = newHand;
+        hands[1].setSplitHand(true);
+
+        hands[1].setBox(new Box((int) (hands[0].getXPos() + (Card.cardWidth * 0.7)), hands[0].getYPos()));
+        hands[0].setBox(new Box((int) (hands[0].getXPos() - (Card.cardWidth * 0.7)), hands[0].getYPos()));
+
+        hands[0].setRunningTotal(hands[0].getCard(0).getcardValue());
+        hands[0].makeGUI(BjSimulation.displayPanel);
+        hands[1].makeGUI(BjSimulation.displayPanel);
+        numOfHands++;
     }
 
-    public int getYBox() {
-        return box.getYPos();
+    public void update() {
+
+        for (int i = 0; i < numOfHands; i++) {
+            if (hands[i] != null) {
+                hands[i].update();
+            }
+        }
     }
 
-    public boolean isStanding() {
+    public void draw(Graphics2D g2) {
+        for (int i = 0; i < numOfHands; i++) {
+            if (hands[i] != null) {
+
+                hands[i].draw(g2);
+            }
+        }
+    }
+
+    public boolean isDonePlaying() {
         boolean temp = true;
-        for (Hand hand : hands) {
-            if (!hand.isStanding()) {
-                temp = false;
+
+        for (int i = 0; i < hands.length; i++) {
+            if (hands[i] != null) {
+                if (!hands[i].isStanding()) {
+                    temp = false;
+                }
             }
         }
 
         return temp;
     }
 
-    public void split(Hand hand) {
-
-        Hand temp = new Hand();
-        Card card1 = hand.getCard(0);
-        Card card2 = hand.getCard(1);
-        temp.addCard(card2);
-        hands[1] = temp;
-
-        hands[0].setBox(new Box((int) (box.getXPos() - (Card.cardWidth * 0.7)), box.getYPos()));
-        hands[1].setBox(new Box((int) (box.getXPos() + (Card.cardWidth * 0.7)), box.getYPos()));
-        numOfHands++;
+    public void decrementNumofHands() {
+        numOfHands--;
     }
 
 }

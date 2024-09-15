@@ -30,10 +30,7 @@ public class DisplayPanel extends JPanel implements Runnable, ActionListener {
     Thread gameLoop;
     // GUI
     static Graphics2D g2;
-    static JButton btnHit;
-    static JButton btnDouble;
-    static JButton btnSplit;
-    static JButton btnStand;
+
     // temp gui stuff
     static String suit = "";
     static String rank = "";
@@ -58,11 +55,13 @@ public class DisplayPanel extends JPanel implements Runnable, ActionListener {
         this.setPreferredSize(new Dimension(windowWidth, windowHeight));
         this.setBackground(new Color(50, 86, 86));
         this.setDoubleBuffered(true);
-        this.addGUI();
-        btnHit.setVisible(false);
-        btnDouble.setVisible(false);
-        btnSplit.setVisible(false);
-        btnStand.setVisible(false);
+        // this.addGUI();
+        /*
+         * btnHit.setVisible(false);
+         * btnDouble.setVisible(false);
+         * btnSplit.setVisible(false);
+         * btnStand.setVisible(false);
+         */
         btnPlay = new JButton("Play");
         btnPlay.setBounds((7 * tile + 6 * tile) / 2, windowHeight - (3 * tile), 2 * tile, tile / 2);
         btnPlay.addActionListener(this);
@@ -80,29 +79,34 @@ public class DisplayPanel extends JPanel implements Runnable, ActionListener {
         gameLoop.start();
     }
 
-    public void addGUI() {
-        // Hit button
-        btnHit = new JButton("Hit");
-        btnHit.setBounds(2 * tile, windowHeight - (2 * tile), 2 * tile, tile / 2);
-        btnHit.addActionListener(this);
-        this.add(btnHit);
-        // Double button
-        btnDouble = new JButton("Double");
-        btnDouble.setBounds(2 * tile + (3 * tile), windowHeight - (2 * tile), 2 * tile, tile / 2);
-        btnDouble.addActionListener(this);
-        this.add(btnDouble);
-        // Split button
-        btnSplit = new JButton("Split");
-        btnSplit.setBounds(2 * tile + (3 * tile * 2), windowHeight - (2 * tile), 2 * tile, tile / 2);
-        btnSplit.addActionListener(this);
-        this.add(btnSplit);
-        // Stand button
-        btnStand = new JButton("Stand");
-        btnStand.setBounds(2 * tile + (3 * tile * 3), windowHeight - (2 * tile), 2 * tile, tile / 2);
-        btnStand.addActionListener(this);
-        this.add(btnStand);
-
-    }
+    /*
+     * public void addGUI() {
+     * // Hit button
+     * btnHit = new JButton("Hit");
+     * btnHit.setBounds(2 * tile, windowHeight - (2 * tile), 2 * tile, tile / 2);
+     * btnHit.addActionListener(this);
+     * this.add(btnHit);
+     * // Double button
+     * btnDouble = new JButton("Double");
+     * btnDouble.setBounds(2 * tile + (3 * tile), windowHeight - (2 * tile), 2 *
+     * tile, tile / 2);
+     * btnDouble.addActionListener(this);
+     * this.add(btnDouble);
+     * // Split button
+     * btnSplit = new JButton("Split");
+     * btnSplit.setBounds(2 * tile + (3 * tile * 2), windowHeight - (2 * tile), 2 *
+     * tile, tile / 2);
+     * btnSplit.addActionListener(this);
+     * this.add(btnSplit);
+     * // Stand button
+     * btnStand = new JButton("Stand");
+     * btnStand.setBounds(2 * tile + (3 * tile * 3), windowHeight - (2 * tile), 2 *
+     * tile, tile / 2);
+     * btnStand.addActionListener(this);
+     * this.add(btnStand);
+     * 
+     * }
+     */
 
     public void run() {
 
@@ -127,7 +131,7 @@ public class DisplayPanel extends JPanel implements Runnable, ActionListener {
     }
 
     public void update() {
-
+        BjSimulation.round.update();
     }
 
     public void paintComponent(Graphics g) {
@@ -148,42 +152,6 @@ public class DisplayPanel extends JPanel implements Runnable, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if (e.getActionCommand().equals("Hit")) {
-
-            Card card = BjSimulation.player.getHand(0).addCard();
-
-            BjSimulation.round.addCardDisplay(card);
-
-            synchronized (BjSimulation.player) {
-                BjSimulation.player.notify();
-            }
-
-        }
-        if (e.getActionCommand().equals("Double")) {
-
-            Card card = BjSimulation.player.getHand(0).Double();
-            BjSimulation.round.addCardDisplay(card);
-            synchronized (BjSimulation.player) {
-                BjSimulation.player.notify();
-            }
-        }
-        if (e.getActionCommand().equals("Split")) {
-
-            BjSimulation.player.split(BjSimulation.player.getHand(0));
-
-            synchronized (BjSimulation.player) {
-                BjSimulation.player.notify();
-            }
-        }
-        if (e.getActionCommand().equals("Stand")) {
-
-            BjSimulation.player.getHand(0).Stand();
-            synchronized (BjSimulation.player) {
-                BjSimulation.player.notify();
-            }
-
-        }
-
         if (e.getActionCommand().equals("Play")) {
 
             BjSimulation.round.startRound();
@@ -194,28 +162,30 @@ public class DisplayPanel extends JPanel implements Runnable, ActionListener {
 
     public static void startRound() {
         btnPlay.setVisible(false);
-        btnHit.setVisible(true);
-        btnDouble.setVisible(true);
+        // btnHit.setVisible(true);
+        // btnDouble.setVisible(true);
         // btnSplit.setVisible(true);
-        btnStand.setVisible(true);
+        // btnStand.setVisible(true);
         displayWinner = false;
 
     }
 
     public static void endRound() {
 
-        btnHit.setVisible(false);
-        btnDouble.setVisible(false);
-        btnSplit.setVisible(false);
-        btnStand.setVisible(false);
+        // btnHit.setVisible(false);
+        // btnDouble.setVisible(false);
+        // btnSplit.setVisible(false);
+        // btnStand.setVisible(false);
         btnPlay.setVisible(true);
     }
 
-    public static void hideGui() {
-        btnHit.setVisible(false);
-        btnDouble.setVisible(false);
-        btnSplit.setVisible(false);
-        btnStand.setVisible(false);
-    }
+    /*
+     * public static void hideGui() {
+     * // btnHit.setVisible(false);
+     * // btnDouble.setVisible(false);
+     * // btnSplit.setVisible(false);
+     * // btnStand.setVisible(false);
+     * }
+     */
 
 }

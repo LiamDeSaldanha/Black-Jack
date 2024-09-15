@@ -67,7 +67,7 @@ public class Counter extends Thread {
 
         running.set(false);
 
-        card.arrived();
+        card.setArrived(true);
 
     }
 

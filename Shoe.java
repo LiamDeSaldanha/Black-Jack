@@ -1,5 +1,6 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
@@ -65,7 +66,13 @@ public class Shoe {
         g2.setColor(Color.WHITE);
         g2.setStroke(new BasicStroke(5));
         g2.drawRoundRect(deckX, deckY, Card.cardWidth, Card.cardHeight, 10, 10); // Draw white
-    }
 
+        g2.setFont(new Font("Arial", Font.BOLD, 28));
+
+        g2.setColor(Color.BLACK);
+
+        g2.drawString(Integer.toString(currentCardCount), deckX + (DisplayPanel.tile/2), deckY + (Card.cardHeight / 2));
+
+    }
 
 }
