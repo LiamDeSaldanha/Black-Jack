@@ -37,7 +37,7 @@ public class BjSimulation {
             System.out.println("Welcome\n" + "==========================\n");
 
             while (!player.isDonePlaying()) {
-                System.out.println(player.isDonePlaying());
+
                 try {
                     synchronized (player) {
                         System.out.println("waiting for play");
@@ -54,31 +54,15 @@ public class BjSimulation {
 
             }
 
-            if (!player.getHand(0).busted()) {
-                // DisplayPanel.hideGui();
+           
                 dealer.Play();
 
-            }
+            
 
-            System.out.println("Dealer: " + dealer.getHand());
-            System.out.println("PLayer: " + player.getHand(0));
-            if (player.getHand(0).busted()) {
-                DisplayPanel.lblWinner.setText("Dealer wins");
-                System.out.println("Dealer wins");
-            } else if (dealer.getHand().getHandValue() > 21) {
-                DisplayPanel.lblWinner.setText("Player wins");
-                System.out.println("Player wins");
-            } else if (dealer.getHand().getHandValue() > player.getHand(0).getHandValue()) {
-                DisplayPanel.lblWinner.setText("Dealer wins");
-                System.out.println("Dealer wins");
-            } else if (dealer.getHand().getHandValue() < player.getHand(0).getHandValue()) {
-                DisplayPanel.lblWinner.setText("Player wins");
-                System.out.println("Player wins");
-            } else {
-                DisplayPanel.lblWinner.setText("Standoff");
-                System.out.println("Standoff");
+            // System.out.println("Dealer: " + dealer.getHand());
+            // System.out.println("PLayer: " + player.getHand(0));
+            round.getStats();
 
-            }
             DisplayPanel.displayWinner = true;
 
             round.endRound();

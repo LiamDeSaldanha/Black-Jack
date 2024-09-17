@@ -34,8 +34,11 @@ public class Player {
 
             }
         }
+        numOfHands = 0;
+        numOfSplitHands = 0;
         hands[0] = new Hand(this, getID(), 0);
         hands[0].setBox(box);
+        numOfHands++;
     }
 
     public Hand getHand(int ID) {
@@ -58,10 +61,12 @@ public class Player {
 
         hands[numOfSplitHands].setBox(new Box((int) (hand.getXPos() + (Card.cardWidth * 0.7)), hand.getYPos()));
         hand.setBox(new Box((int) (hand.getXPos() - (Card.cardWidth * 0.7)), hand.getYPos()));
-
-        hand.setRunningTotal(hand.getCard(0).getcardValue());
+        hand.setRunningTotal(0);
+        hand.setRunningTotal(hand.getCard(0));
         hand.makeGUI(BjSimulation.displayPanel);
         hands[numOfSplitHands].makeGUI(BjSimulation.displayPanel);
+        hand.addCard();
+        hands[numOfSplitHands].addCard();
         numOfHands++;
     }
 

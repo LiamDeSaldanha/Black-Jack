@@ -9,7 +9,11 @@ public class Deck {
                 if (k > 10) {
                     cards[index] = new Card(10, suit, true);
                 } else {
+
                     cards[index] = new Card(k, suit);
+                    if (k == 1) {
+                        cards[index].setAce(true);
+                    }
                 }
                 index++;
             }

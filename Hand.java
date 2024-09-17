@@ -86,9 +86,24 @@ public class Hand implements ActionListener {
 
             card.setBox(new Box(nextX, box.getYPos()));
 
+            if (runningTotal <= 10 && card.isAce()) {
+                runningTotal += 11;
+                soft = true;
+            } else {
+
+                runningTotal += card.getcardValue();
+
+                if (runningTotal > 21 && soft) {
+
+                    runningTotal -= 10;
+                    soft = false;
+
+                }
+
+            }
+
             cards[numOfCards] = card;
             numOfCards++;
-            runningTotal += card.getcardValue();
 
             return card;
 
@@ -99,9 +114,18 @@ public class Hand implements ActionListener {
 
     }
 
+    public boolean isSoft() {
+        return soft;
+    }
+
+    public void setSoft(boolean soft) {
+        this.soft = soft;
+    }
+
     public Card Double() {
         bet += bet;
         Card temp = addCard();
+
         doubled = true;
         return temp;
 
@@ -236,7 +260,7 @@ public class Hand implements ActionListener {
             }
             if (runningTotal > 21) {
                 busted = true;
-
+                removeButtons(BjSimulation.displayPanel);
                 System.out.println("Busted");
                 synchronized (player) {
                     player.notify();
@@ -245,10 +269,6 @@ public class Hand implements ActionListener {
             }
 
             if (numOfCards == 2) {
-
-                doublable = true;
-
-            } else if (isSplitHand() && numOfCards == 1) {
 
                 doublable = true;
 
@@ -263,9 +283,15 @@ public class Hand implements ActionListener {
                 btnStand.setVisible(true);
                 if (splittable) {
                     btnSplit.setVisible(true);
+                } else {
+                    btnSplit.setVisible(false);
                 }
-                if (doublable || splitHand) {
+                if (doublable) {
                     btnDouble.setVisible(true);
+
+                } else {
+                    btnDouble.setVisible(false);
+
                 }
             }
 
@@ -313,7 +339,41 @@ public class Hand implements ActionListener {
 
     public void addCard(Card card) {
         cards[numOfCards] = card;
+        if (runningTotal <= 10 && card.isAce()) {
+            runningTotal += 11;
+            soft = true;
+        } else {
+
+            runningTotal += card.getcardValue();
+
+            if (runningTotal > 21 && soft) {
+
+                runningTotal -= 10;
+                soft = false;
+
+            }
+
+        }
+
         numOfCards++;
+    }
+
+    public void setRunningTotal(Card card) {
+        if (runningTotal <= 10 && card.isAce()) {
+            runningTotal += 11;
+            soft = true;
+        } else {
+
+            runningTotal += card.getcardValue();
+
+            if (runningTotal > 21 && soft) {
+
+                runningTotal -= 10;
+                soft = false;
+
+            }
+
+        }
     }
 
     public void setRunningTotal(int runningTotal) {
@@ -388,7 +448,7 @@ public class Hand implements ActionListener {
         if (e.getActionCommand().equals("Double")) {
 
             Card card = Double();
-
+            removeButtons(BjSimulation.displayPanel);
             synchronized (BjSimulation.player) {
                 BjSimulation.player.notify();
             }
@@ -419,6 +479,10 @@ public class Hand implements ActionListener {
 
     public void setSplittable(boolean splittable) {
         this.splittable = splittable;
+    }
+
+    public boolean hasBJ() {
+        return blackJack;
     }
 
 }

@@ -29,6 +29,40 @@ public class Round {
 
     }
 
+    public void getStats() {
+
+        System.out.println("Dealer: ");
+        System.out.println("================");
+        System.out.println(dealer.getHand());
+
+        System.out.println("Player: " + player.getID());
+        System.out.println("================");
+        for (int i = 0; i < player.getNumHands(); i++) {
+            System.out.println(player.getHand(i));
+
+            if (player.getHand(i).busted())
+
+            {
+                DisplayPanel.lblWinner.setText("Dealer wins");
+                System.out.println("Dealer wins");
+            } else if (dealer.getHand().getHandValue() > 21) {
+                DisplayPanel.lblWinner.setText("Player wins");
+                System.out.println("Player wins");
+            } else if (dealer.getHand().getHandValue() > player.getHand(i).getHandValue()) {
+                DisplayPanel.lblWinner.setText("Dealer wins");
+                System.out.println("Dealer wins");
+            } else if (dealer.getHand().getHandValue() < player.getHand(i).getHandValue()) {
+                DisplayPanel.lblWinner.setText("Player wins");
+                System.out.println("Player wins");
+            } else if (dealer.getHand().hasBJ() && player.getHand(i).hasBJ()) {
+                DisplayPanel.lblWinner.setText("Standoff");
+                System.out.println("Standoff");
+
+            }
+        }
+
+    }
+
     public void endRound() {
 
         dealer.getHand().newHand();
