@@ -3,7 +3,7 @@ public class Deck {
 
     public Deck() {
         int index = 0;
-        for (Card.Suit suit : Card.Suit.values()) {
+        for (Suit suit : Suit.values()) {
             for (int k = 1; k < 14; k++) {
 
                 if (k > 10) {

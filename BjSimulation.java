@@ -36,9 +36,8 @@ public class BjSimulation {
 
             System.out.println("Welcome\n" + "==========================\n");
 
-            while (!player.getHand(0).isStanding() && !player.getHand(0).busted()
-                    && !player.getHand(0).isDoubled()) {
-                        
+            while (!player.isDonePlaying()) {
+                System.out.println(player.isDonePlaying());
                 try {
                     synchronized (player) {
                         System.out.println("waiting for play");

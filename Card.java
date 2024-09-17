@@ -5,23 +5,7 @@ import java.awt.Graphics2D;
 
 public class Card {
 
-    public enum Suit {
-        SPADES("♠"), // Unicode for ♠
-        HEARTS("♥"), // Unicode for ♥
-        DIAMONDS("♦"), // Unicode for ♦
-        CLUBS("♣"); // Unicode for ♣
 
-        private final String symbol;
-
-        // Constructor
-        Suit(String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-    }
 
     private int cardValue;
     private Suit suit;

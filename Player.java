@@ -5,6 +5,8 @@ public class Player {
     private Hand[] hands;
     private int numOfHands;
     private boolean donePlaying;
+    private int numOfSplitHands;
+    private Box box;
 
     public Player(int ID, Box box) {
         this.ID = ID;
@@ -15,6 +17,8 @@ public class Player {
 
         hands[0].setBox(box);
         numOfHands++;
+        numOfSplitHands = 0;
+        this.box = box;
     }
 
     public int getNumHands() {
@@ -22,7 +26,7 @@ public class Player {
     }
 
     public void newRound() {
-        Box box = hands[0].getBox();
+
         for (int i = 0; i < hands.length; i++) {
             if (hands[i] != null) {
                 hands[i].removeButtons(BjSimulation.displayPanel);
@@ -43,20 +47,21 @@ public class Player {
     }
 
     public void split(Hand hand) {
+        numOfSplitHands++;
         Hand newHand = new Hand(this, getID() + 1, hand.getBet());
         Card card2 = hand.getCard(1);
         hand.Split();
 
         newHand.addCard(card2);
-        hands[1] = newHand;
-        hands[1].setSplitHand(true);
+        hands[numOfSplitHands] = newHand;
+        hands[numOfSplitHands].setSplitHand(true);
 
-        hands[1].setBox(new Box((int) (hands[0].getXPos() + (Card.cardWidth * 0.7)), hands[0].getYPos()));
-        hands[0].setBox(new Box((int) (hands[0].getXPos() - (Card.cardWidth * 0.7)), hands[0].getYPos()));
+        hands[numOfSplitHands].setBox(new Box((int) (hand.getXPos() + (Card.cardWidth * 0.7)), hand.getYPos()));
+        hand.setBox(new Box((int) (hand.getXPos() - (Card.cardWidth * 0.7)), hand.getYPos()));
 
-        hands[0].setRunningTotal(hands[0].getCard(0).getcardValue());
-        hands[0].makeGUI(BjSimulation.displayPanel);
-        hands[1].makeGUI(BjSimulation.displayPanel);
+        hand.setRunningTotal(hand.getCard(0).getcardValue());
+        hand.makeGUI(BjSimulation.displayPanel);
+        hands[numOfSplitHands].makeGUI(BjSimulation.displayPanel);
         numOfHands++;
     }
 
@@ -94,6 +99,10 @@ public class Player {
 
     public void decrementNumofHands() {
         numOfHands--;
+    }
+
+    public int getNumOfSplitHands() {
+        return numOfSplitHands;
     }
 
 }

@@ -114,8 +114,8 @@ public class Hand implements ActionListener {
             splittable = false;
             setSplitHand(true);
 
-            Card card = cards[1];
-            cards[1] = null;
+            Card card = cards[player.getNumOfSplitHands()];
+            cards[player.getNumOfSplitHands()] = null;
 
             return card;
 
@@ -158,7 +158,7 @@ public class Hand implements ActionListener {
     }
 
     public boolean isStanding() {
-        return standing;
+        return standing || busted || doubled;
     }
 
     public int getNextFreePosition() {
@@ -404,6 +404,7 @@ public class Hand implements ActionListener {
         if (e.getActionCommand().equals("Stand")) {
 
             Stand();
+            removeButtons(BjSimulation.displayPanel);
             synchronized (BjSimulation.player) {
                 BjSimulation.player.notify();
             }
